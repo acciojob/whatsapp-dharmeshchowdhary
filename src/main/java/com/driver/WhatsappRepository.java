@@ -16,10 +16,11 @@ public class WhatsappRepository {
     private HashMap<String, User> userMap;
     private HashMap<Integer, Message> messageMap;
     private HashSet<String> userMobile;
-    private int customGroupCount;
+    private int myGrpCount;
     private int messageId;
 
     public WhatsappRepository(){
+        this.myGrpCount = 0;
         this.groupMessageMap = new HashMap<Group, List<Message>>();
         this.groupUserMap = new HashMap<Group, List<User>>();
         this.senderMap = new HashMap<Message, User>();
@@ -27,24 +28,30 @@ public class WhatsappRepository {
         this.userMap = new HashMap<String, User>();
         this.messageMap = new HashMap<Integer, Message>();
         this.userMobile = new HashSet<>();
-        this.customGroupCount = 0;
         this.messageId = 0;
     }
 
     public String createUser(String name, String mobile)throws Exception{
-        if(!userMobile.contains(mobile)){
-            throw new Exception("User already exists");
+        try{
+            if(userMobile.contains(mobile)){
+                throw new Exception();
+            }
+            else{
+                userMobile.add(mobile);
+                User user = new User(name, mobile);
+                userMap.put(mobile, user);
+            }
         }
-        userMobile.add(mobile);
-        User user = new User(name, mobile);
-        userMap.put(mobile, user);
+        catch(Exception e){
+            System.out.println("User already exists");
+        }
         return "SUCCESS";
     }
 
     public Group createGroup(List<User> users) {
         if(users.size()>2){
-            customGroupCount++;
-            Group group = new Group("Group "+customGroupCount, users.size());
+            myGrpCount++;
+            Group group = new Group("Group "+ myGrpCount, users.size());
             groupUserMap.put(group, users);
             adminMap.put(group, users.get(0));
             groupMessageMap.put(group, new ArrayList<Message>());
